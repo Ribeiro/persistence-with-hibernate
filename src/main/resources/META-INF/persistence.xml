@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence version="2.0"
+	xmlns="http://java.sun.com/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd">
+	<persistence-unit name="persistence-with-hibernate" transaction-type="RESOURCE_LOCAL">
+	
+		<!-- <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider> 
+			<exclude-unlisted-classes>false</exclude-unlisted-classes> -->
+
+		<provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
+
+		<properties>
+			<!-- Mysql Configs -->
+			<property name="javax.persistence.jdbc.driver" value="com.mysql.jdbc.Driver" />
+			<property name="javax.persistence.jdbc.url" value="jdbc:mysql://localhost:3306/fa7" />
+
+			<!-- Postgres Configs -->
+			<!-- <property name="javax.persistence.jdbc.driver" value="org.postgresql.Driver" 
+				/> <property name="javax.persistence.jdbc.url" value="jdbc:postgresql://localhost/fa7" 
+				/> -->
+
+			<property name="javax.persistence.jdbc.user" value="root" />
+			<property name="javax.persistence.jdbc.password" value="J@nnynh@" />
+
+			<property name="hibernate.dialect" value="org.hibernate.dialect.MySQL5InnoDBDialect" />
+			<property name="hibernate.show_sql" value="true" />
+			<property name="hibernate.format_sql" value="true" />
+			<property name="hibernate.hbm2ddl.auto" value="update" />
+
+			<!-- <property name="eclipselink.ddl-generation" value="drop-and-create-tables"/> 
+				<property name="eclipselink.create-ddl-jdbc-file-name" value="createDDL_ddlGeneration.jdbc"/> 
+				<property name="eclipselink.drop-ddl-jdbc-file-name" value="dropDDL_ddlGeneration.jdbc"/> 
+				<property name="eclipselink.ddl-generation.output-mode" value="both"/> -->
+
+		</properties>
+
+	</persistence-unit>
+</persistence>
