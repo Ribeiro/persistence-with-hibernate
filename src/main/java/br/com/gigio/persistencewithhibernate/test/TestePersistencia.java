@@ -1,25 +1,32 @@
 package br.com.gigio.persistencewithhibernate.test;
 
 import java.util.Calendar;
+import java.util.HashSet;
+
 import javax.persistence.EntityManager;
 import javax.persistence.Persistence;
-import javax.persistence.Query;
 import br.com.gigio.persistencewithhibernate.model.Aluno;
+import br.com.gigio.persistencewithhibernate.model.Curso;
+import br.com.gigio.persistencewithhibernate.model.Disciplina;
+import br.com.gigio.persistencewithhibernate.model.Faculdade;
+import br.com.gigio.persistencewithhibernate.model.Matricula;
+import br.com.gigio.persistencewithhibernate.model.Professor;
+import br.com.gigio.persistencewithhibernate.model.ProfessorDisciplina;
+import br.com.gigio.persistencewithhibernate.util.Horario;
 
 public class TestePersistencia {
-	
-private static EntityManager em = null;
-	
+
+	private static EntityManager em = null;
+
 	public static void main(String[] args) {
-		
+
 		em = (EntityManager) Persistence.createEntityManagerFactory("persistence-with-hibernate").createEntityManager();
-		
+
 		// Inicia uma transação
 		em.getTransaction().begin();
 
 		// ------------ Cria o primeiro Aluno ---------
 		Aluno a1 = new Aluno();
-		a1.setCurso("Computação");
 		a1.setNome("João");
 
 		Calendar dt = Calendar.getInstance();
@@ -29,17 +36,14 @@ private static EntityManager em = null;
 		dt.set(Calendar.DAY_OF_MONTH, 11);
 
 		a1.setDataNascimento(dt.getTime());
-		a1.setTemFies(true);
+		a1.setMatricula("22222");
+		a1.setCpf("123456");
 
-		// Até aqui o Aluno João ainda não foi
-		// persistido no banco de dados
-		em.persist(a1); // Aqui a entidade é persistida
-		em.flush(); // Força uma sincronização imediata com o banco de dados
+		em.persist(a1);
+		em.flush();
 
-		// ------------ Cria o segundo Aluno ---------
 		Aluno a2 = new Aluno();
 
-		a2.setCurso("Computação");
 		a2.setNome("Pedro");
 
 		dt = Calendar.getInstance();
@@ -49,37 +53,116 @@ private static EntityManager em = null;
 		dt.set(Calendar.DAY_OF_MONTH, 3);
 
 		a2.setDataNascimento(dt.getTime());
-		a2.setTemFies(false);
-		a2.setQuantidadeReprovacoes(3);
+		a2.setMatricula("11111");
+		a2.setCpf("1234");
 
 		em.persist(a2);
 		em.flush();
 
-		System.out.println("Aluno 1 Id : " + a1.getId());
-		System.out.println("Aluno 2 Id : " + a2.getId());
+		Professor p = new Professor();
 
-		// ------------ Consulta o objeto persistido ---------
-		Query query = em
-				.createQuery("Select a from Aluno a where a.id=:idaluno");
-		
-		
-		query.setParameter("idaluno", a2.getId());
-		Aluno retrieved2 = (Aluno) query.getSingleResult();
-				
-		// ------------ Update ---------
+		p.setNome("Lucas");
 
-		a2.setQuantidadeReprovacoes(2);
-		em.merge(a2);
+		dt = Calendar.getInstance();
+
+		dt.set(Calendar.YEAR, 1972);
+		dt.set(Calendar.MONTH, Calendar.JANUARY);
+		dt.set(Calendar.DAY_OF_MONTH, 3);
+
+		p.setDataNascimento(dt.getTime());
+		p.setTitulacao("Doutor");
+		p.setCpf("232313");
+
+		em.persist(p);
 		em.flush();
 
-		System.out.println("Aluno 2 Id : " + a2.getId());
-		System.out.println("Aluno 2 Nome : " + a2.getNome());
-		System.out.println("Aluno 2 Curso : " + a2.getCurso());
-		System.out.println("Aluno 2 FIES : " + retrieved2.getTemFies());
+		Faculdade f = new Faculdade();
+		f.setNome("FA7");
 
-		// ------------ Removendo Entradas no banco ---------
-		//em.remove(a1);
-		//em.remove(a2);
+		em.persist(f);
+		em.flush();
+
+		Curso c = new Curso();
+		c.setCargaHoraria(400);
+		c.setNome("Computação");
+		c.setFaculdade(f);
+
+		em.persist(c);
+		em.flush();
+
+		Curso c2 = new Curso();
+		c2.setCargaHoraria(400);
+		c2.setNome("Direito");
+		c2.setFaculdade(f);
+
+		em.persist(c2);
+		em.flush();
+
+		Disciplina d = new Disciplina();
+		d.setNome("Direito constitucional");
+		d.setCargaHoraria(20);
+
+		em.persist(d);
+		em.flush();
+
+		Disciplina d2 = new Disciplina();
+		d2.setNome("IA");
+		d2.setCargaHoraria(60);
+
+		em.persist(d2);
+		em.flush();
+
+		Disciplina d3 = new Disciplina();
+		d3.setNome("Lógica de Programação");
+		d3.setCargaHoraria(40);
+
+		em.persist(d3);
+		em.flush();
+
+		Disciplina d4 = new Disciplina();
+		d4.setNome("Cálculo");
+		d4.setCargaHoraria(40);
+
+		c.setDisciplinas(new HashSet<Disciplina>());
+		c.getDisciplinas().add(d2);
+		c.getDisciplinas().add(d3);
+		c.getDisciplinas().add(d4);
+
+		em.persist(c);
+		em.flush();
+
+		c2.setDisciplinas(new HashSet<Disciplina>());
+		c2.getDisciplinas().add(d);
+
+		em.persist(c2);
+		em.flush();
+
+		ProfessorDisciplina pd = new ProfessorDisciplina();
+
+		pd.setDisciplina(d3);
+		pd.setHorario(Horario.ManhaAB);
+		pd.setProfessor(p);
+
+		em.persist(pd);
+		em.flush();
+
+		Matricula m = new Matricula();
+
+		m.setAluno(a1);
+		m.setAnoPeriodo("2014/1");
+		m.setProfessorDisciplina(pd);
+
+		em.persist(m);
+		em.flush();
+
+		m = new Matricula();
+
+		m.setAluno(a2);
+		m.setAnoPeriodo("2014/1");
+		m.setProfessorDisciplina(pd);
+
+		em.persist(m);
+		em.flush();
 
 		em.getTransaction().commit();
 	}
